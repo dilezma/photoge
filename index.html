@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FotoKu - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <h1>FotoKu</h1>
+                <p class="tagline">Simpan kenangan indah Anda</p>
+            </div>
+            
+            <div class="login-form">
+                <h2>Masuk ke Akun Anda</h2>
+                
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Nama Pengguna
+                    </label>
+                    <input type="text" id="username" placeholder="Masukkan username Anda" autocomplete="username">
+                    <div class="error-message" id="username-error"></div>
+                </div>
+                
+                <button id="login-btn" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
+                </button>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Username akan tersimpan otomatis di browser Anda</p>
+                </div>
+                
+                <div class="divider">
+                    <span>ATAU</span>
+                </div>
+                
+                <button id="admin-btn" class="btn-admin">
+                    <i class="fas fa-user-shield"></i> Masuk sebagai Admin
+                </button>
+            </div>
+            
+            <div class="footer">
+                <p>Menggunakan GitHub sebagai penyimpanan data</p>
+            </div>
+        </div>
+        
+        <div class="notification" id="notification"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
