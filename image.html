@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARS Generator Gambar - Gemini AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(25, 25, 35, 0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #3a1c71, #d76d77, #ffaf7b);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .api-status {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .api-status.active {
+            color: #4ade80;
+        }
+        
+        .api-status.inactive {
+            color: #f87171;
+        }
+        
+        .api-status i {
+            font-size: 12px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-header h2 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-header h2 i {
+            color: #d76d77;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #d76d77;
+            border-radius: 10px;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        
+        .user-message .message-avatar {
+            background-color: #3a1c71;
+        }
+        
+        .ai-message .message-avatar {
+            background: linear-gradient(to right, #d76d77, #ffaf7b);
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .user-message .message-content {
+            background-color: #3a1c71;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message .message-content {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .ai-message .message-content img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .message-input:focus {
+            border-color: #d76d77;
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .send-button {
+            background: linear-gradient(to right, #d76d77, #ffaf7b);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(215, 109, 119, 0.5);
+        }
+        
+        .image-preview {
+            flex: 0 0 380px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(20, 20, 30, 0.8);
+            overflow-y: auto;
+        }
+        
+        .image-preview h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .image-preview h2 i {
+            color: #ffaf7b;
+        }
+        
+        .generated-image-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+        
+        .generated-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .placeholder-image {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .placeholder-image i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .image-info {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 14px;
+        }
+        
+        .image-info h3 {
+            margin-bottom: 10px;
+            color: #ffaf7b;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #d76d77;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .instructions {
+            background-color: rgba(58, 28, 113, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            color: #d76d77;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .instructions li strong {
+            color: #ffaf7b;
+        }
+        
+        /* Responsiveness */
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .image-preview {
+                flex: 0 0 auto;
+                height: 300px;
+            }
+            
+            .container {
+                height: 95vh;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .api-status {
+                align-self: flex-start;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ARS Generator Gambar</h1>
+                    <p>Chat dengan Gemini AI untuk menghasilkan gambar</p>
+                </div>
+            </div>
+            <div class="api-status active" id="apiStatus">
+                <i class="fas fa-circle"></i>
+                <span>API Gemini Terhubung</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2><i class="fas fa-comments"></i> Percakapan dengan Gemini AI</h2>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Pesan akan dimuat di sini melalui JavaScript -->
+                    <div class="message ai-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Halo! Saya Gemini AI. Saya dapat membantu Anda menghasilkan gambar berdasarkan deskripsi teks.</p>
+                            <p>Coba minta saya untuk membuat gambar seperti: "buatkan gambar pemandangan pantai dengan matahari terbenam" atau "gambar kucing lucu bermain dengan bola benang".</p>
+                            <div class="message-time">Baru saja</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Ketik permintaan gambar Anda di sini...">
+                    <button class="send-button" id="sendButton">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="image-preview">
+                <h2><i class="fas fa-image"></i> Gambar Hasilkan</h2>
+                
+                <div class="generated-image-container">
+                    <div class="placeholder-image" id="placeholderImage">
+                        <i class="fas fa-image"></i>
+                        <p>Gambar akan muncul di sini setelah Anda mengirim permintaan</p>
+                    </div>
+                    
+                    <div class="loading" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <p>Sedang menghasilkan gambar...</p>
+                    </div>
+                    
+                    <img class="generated-image" id="generatedImage" src="" alt="Gambar Hasil AI">
+                </div>
+                
+                <div class="image-info" id="imageInfo">
+                    <h3>Info Gambar</h3>
+                    <p id="imagePrompt">Tidak ada gambar yang dihasilkan</p>
+                    <p id="imageTime">-</p>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-lightbulb"></i> Tips Permintaan Gambar</h3>
+                    <ul>
+                        <li><strong>Jelaskan detail:</strong> "gambar sunset di pantai dengan warna oranye dan ungu"</li>
+                        <li><strong>Tambahkan gaya:</strong> "ilustrasi kartun anak kucing bermain dengan kupu-kupu"</li>
+                        <li><strong>Sebutkan objek utama:</strong> "gambar naga terbang di atas gunung dengan cahaya bulan"</li>
+                        <li><strong>Gunakan bahasa deskriptif:</strong> "pemandangan kota futuristik dengan gedung pencakar langit dan kendaraan terbang"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Key Gemini
+        const API_KEY = "AIzaSyAWEtTiGqRFdGsgtvMXdhDrtjOhmv_OYoo";
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+        const IMAGE_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro-vision:generateContent?key=${API_KEY}`;
+        
+        // Elemen DOM
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const generatedImage = document.getElementById('generatedImage');
+        const placeholderImage = document.getElementById('placeholderImage');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const imagePrompt = document.getElementById('imagePrompt');
+        const imageTime = document.getElementById('imageTime');
+        const apiStatus = document.getElementById('apiStatus');
+        
+        // Status API
+        let apiConnected = true;
+        
+        // Format waktu
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Tambah pesan ke chat
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const avatarIcon = isUser ? 'fas fa-user' : 'fas fa-robot';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="${avatarIcon}"></i>
+                </div>
+                <div class="message-content">
+                    <p>${content}</p>
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Tambah pesan dengan gambar ke chat
+        function addImageMessage(prompt, imageUrl) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai-message';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p>Berikut gambar berdasarkan permintaan Anda: "${prompt}"</p>
+                    <img src="${imageUrl}" alt="Gambar hasil AI">
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Tampilkan gambar yang dihasilkan
+        function showGeneratedImage(imageUrl, prompt) {
+            placeholderImage.style.display = 'none';
+            generatedImage.src = imageUrl;
+            generatedImage.style.display = 'block';
+            
+            // Update informasi gambar
+            imagePrompt.textContent = prompt;
+            imageTime.textContent = `Dihasilkan: ${getCurrentTime()}`;
+        }
+        
+        // Tampilkan indikator loading
+        function showLoading() {
+            loadingIndicator.style.display = 'flex';
+            placeholderImage.style.display = 'none';
+            generatedImage.style.display = 'none';
+        }
+        
+        // Sembunyikan indikator loading
+        function hideLoading() {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        // Hasilkan gambar menggunakan Gemini API (simulasi)
+        // Catatan: Gemini API tidak sebenarnya menghasilkan gambar, jadi kami menggunakan placeholder
+        async function generateImageWithGemini(prompt) {
+            showLoading();
+            
+            try {
+                // Simulasi waktu pemrosesan
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Karena Gemini API tidak menghasilkan gambar secara langsung,
+                // kita akan menggunakan gambar placeholder berdasarkan prompt
+                const imageKeywords = prompt.toLowerCase();
+                let imageUrl;
+                
+                // Pilih gambar placeholder berdasarkan kata kunci dalam prompt
+                if (imageKeywords.includes('pantai') || imageKeywords.includes('beach') || imageKeywords.includes('sunset')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop';
+                } else if (imageKeywords.includes('kucing') || imageKeywords.includes('cat') || imageKeywords.includes('kitten')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1514888286974-6d03bde4ba42?w-600&auto=format&fit=crop';
+                } else if (imageKeywords.includes('naga') || imageKeywords.includes('dragon')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=600&auto=format&fit=crop';
+                } else if (imageKeywords.includes('kota futuristik') || imageKeywords.includes('futuristic')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&auto=format&fit=crop';
+                } else if (imageKeywords.includes('gunung') || imageKeywords.includes('mountain')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1464278533981-50106e6176b1?w=600&auto=format&fit=crop';
+                } else if (imageKeywords.includes('hutan') || imageKeywords.includes('forest')) {
+                    imageUrl = 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&auto=format&fit=crop';
+                } else {
+                    // Gambar default untuk prompt lainnya
+                    imageUrl = 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=600&auto=format&fit=crop';
+                }
+                
+                // Tambahkan parameter acak untuk menghindari cache
+                imageUrl += `?${new Date().getTime()}`;
+                
+                // Tampilkan gambar
+                showGeneratedImage(imageUrl, prompt);
+                
+                // Tambahkan pesan dengan gambar ke chat
+                addImageMessage(prompt, imageUrl);
+                
+                // Simulasikan respons AI
+                const responses = [
+                    "Saya telah menghasilkan gambar berdasarkan permintaan Anda. Apakah Anda ingin membuat gambar lain?",
+                    "Gambar sudah siap! Ada yang lain yang bisa saya bantu?",
+                    "Ini hasilnya. Jika Anda ingin penyesuaian, silakan beri tahu saya.",
+                    "Gambar telah dibuat sesuai deskripsi Anda. Silakan lihat hasilnya."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse);
+                
+            } catch (error) {
+                console.error('Error generating image:', error);
+                addMessage("Maaf, terjadi kesalahan saat menghasilkan gambar. Silakan coba lagi.");
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Kirim pesan
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Tambah pesan pengguna
+            addMessage(message, true);
+            
+            // Kosongkan input
+            messageInput.value = '';
+            
+            // Generate gambar
+            await generateImageWithGemini(message);
+        }
+        
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Inisialisasi chat dengan contoh
+        document.addEventListener('DOMContentLoaded', function() {
+            // Contoh percakapan awal
+            setTimeout(() => {
+                addMessage("Coba minta gambar seperti 'pemandangan pantai dengan pohon kelapa' atau 'gambar astronaut di luar angkasa' untuk melihat kemampuan saya.");
+            }, 1000);
+        });
+        
+        // Simulasi status koneksi API
+        setInterval(() => {
+            if (apiConnected) {
+                apiStatus.innerHTML = '<i class="fas fa-circle"></i><span>API Gemini Terhubung</span>';
+                apiStatus.className = 'api-status active';
+            } else {
+                apiStatus.innerHTML = '<i class="fas fa-circle"></i><span>API Gemini Terputus</span>';
+                apiStatus.className = 'api-status inactive';
+            }
+            
+            // Ganti status acak (hanya untuk simulasi)
+            apiConnected = Math.random() > 0.1;
+        }, 10000);
+    </script>
+</body>
+</html>
